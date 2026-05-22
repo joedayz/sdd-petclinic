@@ -19,6 +19,7 @@
         <quarkus-jooq.version>2.1.0</quarkus-jooq.version>
         <testcontainers-jooq-codegen-maven-plugin.version>0.0.4</testcontainers-jooq-codegen-maven-plugin.version>
         <surefire-plugin.version>3.5.4</surefire-plugin.version>
+        <jackson3.version>3.1.2</jackson3.version>
     </properties>
 
     <repositories>
@@ -51,6 +52,17 @@
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- Vaadin 25.1 requires Jackson 3.1+; browserless-test-junit6 pins 3.0.4 -->
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -102,6 +114,11 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>browserless-test-junit6</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

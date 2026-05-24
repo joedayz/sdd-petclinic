@@ -19,9 +19,9 @@ If a use case and the code disagree, the use case wins unless the user says othe
 
 ## Stack
 
-- **Java 25**, **Spring Boot 4.0.5**, **Vaadin 25.1**
+- **Java 25**, **Quarkus 3.32.3**, **Vaadin 25.1**
 - **jOOQ** for type-safe SQL — generated sources live in `target/generated-sources/jooq` under package
-  `ai.unifiedprocess.demo.petclinic.database`
+  `pe.joedayz.petclinic.database`
 - **Flyway** migrations in `src/main/resources/db/migration` (currently empty — migrations are added as features are
   implemented)
 - **PostgreSQL** in prod; **Testcontainers** (`postgres:17-alpine`) for tests *and* for jOOQ code generation at build
@@ -30,8 +30,8 @@ If a use case and the code disagree, the use case wins unless the user says othe
 ## Commands
 
 ```bash
-# Run the app locally (Testcontainers-backed Postgres via TestAiupPetclinicApplication)
-./mvnw spring-boot:test-run
+# Run the app locally (Quarkus Dev Services starts Postgres when Docker is running)
+./mvnw quarkus:dev
 
 # Full build — this also runs jOOQ codegen against a throwaway Testcontainers Postgres
 ./mvnw verify
@@ -40,7 +40,7 @@ If a use case and the code disagree, the use case wins unless the user says othe
 ./mvnw test
 
 # Run a single test class / method
-./mvnw test -Dtest=AiupPetclinicApplicationTests
+./mvnw test -Dtest=PetclinicApplicationTest
 ./mvnw test -Dtest=OwnerViewTest#findsOwnersByLastName
 
 # Regenerate jOOQ sources after changing a Flyway migration
@@ -54,14 +54,14 @@ re-run `generate-sources` (or any phase after it).**
 
 ## Architecture
 
-Single Maven module, **package-by-feature** under `ai.unifiedprocess.petclinic` — each feature (e.g. `owner`, `pet`,
+Single Maven module, **package-by-feature** under `pe.joedayz.petclinic` — each feature (e.g. `owner`, `pet`,
 `visit`, `vet`) is its own package containing two sub-packages:
 
 - **`ui`** — Vaadin views, forms, and other UI components for that feature. One view per use case / screen.
 - **`domain`** — domain types and jOOQ query logic for that feature. Queries are written against the generated
   `database.*` tables/records. No JPA, no Spring Data repositories.
 
-So a feature looks like `ai.unifiedprocess.petclinic.<feature>.ui.*` and `ai.unifiedprocess.petclinic.<feature>.domain.*`.
+So a feature looks like `pe.joedayz.petclinic.<feature>.ui.*` and `pe.joedayz.petclinic.<feature>.domain.*`.
 Cross-feature reach-in should go through the other feature's `domain` package, not its `ui`.
 
 **Flyway migrations** define the schema declaratively; jOOQ codegen consumes them, so the migrations effectively *are*
@@ -73,11 +73,11 @@ justifies extraction.
 
 ## Testing conventions
 
-- **Vaadin Browserless Testing** (`browserless-test-junit6`) is the default for Vaadin view tests — server-side, no
-  browser, no servlet container. See https://vaadin.com/docs/latest/flow/testing/browserless/getting-started.
-- View tests extend `SpringBrowserlessTest` and are annotated `@SpringBootTest`. They run inside a Spring context and
-  use the same Testcontainers Postgres as the rest of the integration tests.
-- Core API (all inherited from `SpringBrowserlessTest`):
+- **Vaadin Browserless Testing** for Quarkus: add `browserless-test-quarkus` and `quarkus-junit` (test scope). See
+  https://vaadin.com/docs/latest/flow/testing/browserless/quarkus.
+- View tests extend `QuarkusBrowserlessTest` and are annotated `@QuarkusTest`. Quarkus boots the application for the
+  test JVM (CDI, `QuarkusInstantiator`, etc.); browserless tests still drive the UI server-side without a real browser.
+- Core API (all inherited from `QuarkusBrowserlessTest`):
     - `navigate(MyView.class)` — routes to the view *and returns the instantiated view instance*. This is how you get
       hold of the view under test.
     - `test(component).setValue(...)` / `test(component).click()` — wrap a component to simulate user interaction.
@@ -94,16 +94,29 @@ justifies extraction.
   asserting on domain state pulled back out of the view.
 - For rendered-state assertions (owner name shown, pet listed, etc.), find the actual `Paragraph`/`H3`/etc. via
   `$(Paragraph.class)` and assert on `.getText()` so the render path is exercised end-to-end.
-- Integration tests compose with `TestcontainersConfiguration` (see
-  `src/test/java/.../TestcontainersConfiguration.java`) for a real Postgres.
+- **Database in tests:** use **Quarkus Dev Services** — Postgres starts automatically in `%dev` and `%test` when Docker
+  is running (`quarkus.datasource.devservices.image-name=postgres:17-alpine` in `application.properties`). No Spring
+  `TestcontainersConfiguration` bean is required.
+- **Jackson:** Vaadin 25.1 requires Jackson **3.1+**. If a test dependency pulls 3.0.x, pin `tools.jackson.core`
+  `jackson-core` / `jackson-databind` to `3.1.2` in `dependencyManagement` (see `pom.xml`).
+- **Security scenarios:** with Quarkus Security on the classpath, use `@TestSecurity` on browserless test methods (see
+  Vaadin Quarkus browserless docs).
 
-## Skills available for this project
+## AIUP skills (optional)
 
-This repo has AIUP-specific skills registered — prefer them over ad-hoc generation:
+The [AI Unified Process](https://unifiedprocess.ai/) defines optional Cursor/Claude **skills** (separate packages, not
+shipped inside this repo). If you have them installed in your editor, prefer them over ad-hoc prompts:
 
-- `aiup-core:entity-model`, `aiup-core:use-case-spec`, `aiup-core:use-case-diagram`, `aiup-core:requirements` — for
-  authoring/updating specs in `docs/`.
-- `aiup-vaadin-jooq:flyway-migration` — generate `V*.sql` from the entity model.
-- `aiup-vaadin-jooq:implement` — implement a use case end-to-end (Vaadin view + jOOQ queries).
-- `aiup-vaadin-jooq:playwright-test` — browser-based end-to-end tests (the `karibu-test` skill is obsolete; server-side
-  tests use `SpringBrowserlessTest` directly, see *Testing conventions* above).
+| Skill | Use when |
+| --- | --- |
+| `aiup-core:entity-model` | Create or update `docs/entity_model.md` |
+| `aiup-core:use-case-spec` | Write or refine `docs/use_cases/UC-*.md` |
+| `aiup-core:use-case-diagram` | Update `docs/use_cases.puml` |
+| `aiup-core:requirements` | Broader requirements work in `docs/` |
+| `aiup-vaadin-jooq:flyway-migration` | Generate `src/main/resources/db/migration/V*.sql` from the entity model |
+| `aiup-vaadin-jooq:implement` | Implement a UC end-to-end (Vaadin view + jOOQ); adapt for **Quarkus** + `QuarkusBrowserlessTest` |
+| `aiup-vaadin-jooq:playwright-test` | Full browser E2E tests (optional; UC view tests stay browserless per *Testing conventions*) |
+
+**If those skills are not installed**, follow the same workflow manually: read the UC spec → implement under
+`pe.joedayz.petclinic.<feature>.ui` / `.domain` → add a `QuarkusBrowserlessTest` in the view's package → `./mvnw test`.
+The `karibu-test` / UI Unit Testing skill names are obsolete; do not use them.

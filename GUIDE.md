@@ -14,7 +14,7 @@
 ✅ TAREA 2: Decirle a Claude "Implementa UC-001"
    [ ] Create CLADUDE.md como guía.
    [ ] Le dijiste a Claude algo como:
-   ""Implementa UC-001 (View Welcome Page) siguiendo CLAUDE.md. Los tests deben pasar y mapear con la spec."
+   "Implementa UC-001 (View Welcome Page) siguiendo CLAUDE.md. Los tests deben pasar y mapear con la spec."
    [ ] Claude crea WelcomeView.java
    [ ] Claude crea MainLayout.java
    [ ] Claude crea UC001ViewWelcomePageTest.java

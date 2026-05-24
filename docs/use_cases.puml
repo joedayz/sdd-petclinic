@@ -5,7 +5,7 @@ skinparam packageStyle rectangle
 actor "Visitante" as visitor
 actor "Usuario de la clínica" as user
 
-rectangle "Spring PetClinic" {
+rectangle "Quarkus PetClinic" {
 
     package "General" {
         usecase "UC-001\nVer página de bienvenida" as UC001

@@ -1,122 +1,123 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Este archivo orienta a Claude Code (claude.ai/code) al trabajar con el código de este repositorio.
 
-## Project purpose
+## Propósito del proyecto
 
-This is a demo for a talk on **Spec-Driven Development with the AI Unified Process (AIUP)**. It re-implements the
-classic Spring PetClinic by writing the specs first (`docs/`) and generating code against them.
+Este es un demo para una charla sobre **Spec-Driven Development con el AI Unified Process (AIUP)**. Reimplementa el
+PetClinic clásico escribiendo primero las especificaciones (`docs/`) y generando el código a partir de ellas.
 
-**`docs/` is the source of truth, not the code.** When asked to implement something, read the relevant spec first:
+**`docs/` es la fuente de verdad, no el código.** Cuando pidas implementar algo, lee primero la spec relevante:
 
-- `docs/entity_model.md` — ER diagram and attribute tables with validation rules. The schema in Flyway migrations must
-  match this.
-- `docs/use_cases.puml` — PlantUML actor/use-case diagram.
-- `docs/use_cases/UC-NNN-*.md` — one file per use case with preconditions, main success scenario, alternative flows,
-  postconditions, business rules. UI flows, field labels, and navigation come from these.
+- `docs/entity_model.md` — diagrama ER y tablas de atributos con reglas de validación. El esquema en las migraciones
+  Flyway debe coincidir con esto.
+- `docs/use_cases.puml` — diagrama PlantUML de actores y casos de uso.
+- `docs/use_cases/UC-NNN-*.md` — un archivo por caso de uso con precondiciones, escenario principal de éxito, flujos
+  alternativos, postcondiciones y reglas de negocio. Los flujos de UI, etiquetas de campos y la navegación salen de
+  aquí.
 
-If a use case and the code disagree, the use case wins unless the user says otherwise.
+Si un caso de uso y el código no coinciden, gana el caso de uso salvo que el usuario indique lo contrario.
 
 ## Stack
 
 - **Java 25**, **Quarkus 3.32.3**, **Vaadin 25.1**
-- **jOOQ** for type-safe SQL — generated sources live in `target/generated-sources/jooq` under package
+- **jOOQ** para SQL type-safe — las fuentes generadas viven en `target/generated-sources/jooq` bajo el paquete
   `pe.joedayz.petclinic.database`
-- **Flyway** migrations in `src/main/resources/db/migration` (currently empty — migrations are added as features are
-  implemented)
-- **PostgreSQL** in prod; **Testcontainers** (`postgres:17-alpine`) for tests *and* for jOOQ code generation at build
-  time
+- **Flyway** en `src/main/resources/db/migration` (vacío por ahora — se añaden migraciones al implementar features)
+- **PostgreSQL** en prod; **Testcontainers** (`postgres:17-alpine`) para tests *y* para la generación de código jOOQ
+  en el build
 
-## Commands
+## Comandos
 
 ```bash
-# Run the app locally (Quarkus Dev Services starts Postgres when Docker is running)
+# Ejecutar la app en local (Quarkus Dev Services levanta Postgres si Docker está corriendo)
 ./mvnw quarkus:dev
 
-# Full build — this also runs jOOQ codegen against a throwaway Testcontainers Postgres
+# Build completo — también ejecuta codegen jOOQ contra un Postgres efímero de Testcontainers
 ./mvnw verify
 
-# Run all tests (Docker must be running)
+# Ejecutar todos los tests (Docker debe estar corriendo)
 ./mvnw test
 
-# Run a single test class / method
+# Ejecutar una clase o método de test concreto
 ./mvnw test -Dtest=PetclinicApplicationTest
 ./mvnw test -Dtest=OwnerViewTest#findsOwnersByLastName
 
-# Regenerate jOOQ sources after changing a Flyway migration
+# Regenerar fuentes jOOQ tras cambiar una migración Flyway
 ./mvnw generate-sources
 ```
 
-Docker must be running for `test`, `verify`, and `generate-sources` — the `testcontainers-jooq-codegen-maven-plugin`
-spins up Postgres, applies the Flyway scripts from `src/main/resources/db/migration`, and generates jOOQ classes from
-the resulting schema. **If you add or change a migration, jOOQ classes won't update until you
-re-run `generate-sources` (or any phase after it).**
+Docker debe estar corriendo para `test`, `verify` y `generate-sources` — el plugin `testcontainers-jooq-codegen-maven-plugin`
+levanta Postgres, aplica los scripts Flyway de `src/main/resources/db/migration` y genera las clases jOOQ a partir del
+esquema resultante. **Si añades o cambias una migración, las clases jOOQ no se actualizarán hasta que vuelvas a ejecutar
+`generate-sources` (o cualquier fase posterior).**
 
-## Architecture
+## Arquitectura
 
-Single Maven module, **package-by-feature** under `pe.joedayz.petclinic` — each feature (e.g. `owner`, `pet`,
-`visit`, `vet`) is its own package containing two sub-packages:
+Módulo Maven único, **package-by-feature** bajo `pe.joedayz.petclinic` — cada feature (p. ej. `owner`, `pet`,
+`visit`, `vet`) es su propio paquete con dos subpaquetes:
 
-- **`ui`** — Vaadin views, forms, and other UI components for that feature. One view per use case / screen.
-- **`domain`** — domain types and jOOQ query logic for that feature. Queries are written against the generated
-  `database.*` tables/records. No JPA, no Spring Data repositories.
+- **`ui`** — vistas Vaadin, formularios y demás componentes de UI de esa feature. Una vista por caso de uso / pantalla.
+- **`domain`** — tipos de dominio y lógica de consultas jOOQ de esa feature. Las consultas se escriben contra las
+  tablas/registros generados `database.*`. Sin JPA, sin repositorios Spring Data.
 
-So a feature looks like `pe.joedayz.petclinic.<feature>.ui.*` and `pe.joedayz.petclinic.<feature>.domain.*`.
-Cross-feature reach-in should go through the other feature's `domain` package, not its `ui`.
+Así, una feature queda como `pe.joedayz.petclinic.<feature>.ui.*` y `pe.joedayz.petclinic.<feature>.domain.*`.
+El acceso cruzado entre features debe ir por el paquete `domain` del otro feature, no por su `ui`.
 
-**Flyway migrations** define the schema declaratively; jOOQ codegen consumes them, so the migrations effectively *are*
-the schema DSL.
+Las **migraciones Flyway** definen el esquema de forma declarativa; el codegen jOOQ las consume, así que las migraciones
+*son* efectivamente el DSL del esquema.
 
-The project is intentionally thin on layers — there is no separate service/repository/DTO layering beyond `ui` +
-`domain` unless a use case demands it. Prefer putting jOOQ query logic close to where it's used until duplication
-justifies extraction.
+El proyecto es deliberadamente fino en capas — no hay service/repository/DTO separados más allá de `ui` + `domain`
+salvo que un caso de uso lo exija. Prefiere dejar la lógica jOOQ cerca de donde se usa hasta que la duplicación
+justifique extraerla.
 
-## Testing conventions
+## Convenciones de testing
 
-- **Vaadin Browserless Testing** for Quarkus: add `browserless-test-quarkus` and `quarkus-junit` (test scope). See
+- **Vaadin Browserless Testing** para Quarkus: añade `browserless-test-quarkus` y `quarkus-junit` (scope test). Ver
   https://vaadin.com/docs/latest/flow/testing/browserless/quarkus.
-- View tests extend `QuarkusBrowserlessTest` and are annotated `@QuarkusTest`. Quarkus boots the application for the
-  test JVM (CDI, `QuarkusInstantiator`, etc.); browserless tests still drive the UI server-side without a real browser.
-- Core API (all inherited from `QuarkusBrowserlessTest`):
-    - `navigate(MyView.class)` — routes to the view *and returns the instantiated view instance*. This is how you get
-      hold of the view under test.
-    - `test(component).setValue(...)` / `test(component).click()` — wrap a component to simulate user interaction.
-      Prefer this over calling setters/listeners directly.
-    - `$(Type.class).single()` / `$(Type.class).all()` — query the current UI tree for components by type. Use this for
-      `Notification`, `Dialog`, and anything not directly reachable from the view.
-    - `fireShortcut(Key.ENTER)` / `fireShortcut(Key.KEY_S, KeyModifier.CONTROL)` — simulate keyboard shortcuts.
-- **Component field access:** place tests in the **same package** as the view and access component fields that are *
-  *package-private** directly (`view.lastNameField`, `view.resultsGrid`). This is the idiomatic browserless pattern —
-  fields are not a "test backdoor", they're the view's structure. **Do not add public getters just for tests.**
-- For custom form components (e.g. `OwnerForm`, `PetForm`), the form's package-private fields are part of its contract —
-  `test(view.ownerForm.firstName).setValue(...)` is fine.
-- For navigation assertions, check `UI.getCurrent().getInternals().getActiveViewLocation().getPath()` rather than
-  asserting on domain state pulled back out of the view.
-- For rendered-state assertions (owner name shown, pet listed, etc.), find the actual `Paragraph`/`H3`/etc. via
-  `$(Paragraph.class)` and assert on `.getText()` so the render path is exercised end-to-end.
-- **Database in tests:** use **Quarkus Dev Services** — Postgres starts automatically in `%dev` and `%test` when Docker
-  is running (`quarkus.datasource.devservices.image-name=postgres:17-alpine` in `application.properties`). No Spring
-  `TestcontainersConfiguration` bean is required.
-- **Jackson:** Vaadin 25.1 requires Jackson **3.1+**. If a test dependency pulls 3.0.x, pin `tools.jackson.core`
-  `jackson-core` / `jackson-databind` to `3.1.2` in `dependencyManagement` (see `pom.xml`).
-- **Security scenarios:** with Quarkus Security on the classpath, use `@TestSecurity` on browserless test methods (see
-  Vaadin Quarkus browserless docs).
+- Los tests de vista extienden `QuarkusBrowserlessTest` y llevan `@QuarkusTest`. Quarkus arranca la aplicación en la
+  JVM de test (CDI, `QuarkusInstantiator`, etc.); los tests browserless siguen manejando la UI en el servidor sin
+  navegador real.
+- API principal (heredada de `QuarkusBrowserlessTest`):
+    - `navigate(MyView.class)` — navega a la vista *y devuelve la instancia creada*. Así obtienes la vista bajo test.
+    - `test(component).setValue(...)` / `test(component).click()` — envuelve un componente para simular interacción.
+      Prefiere esto a llamar setters/listeners directamente.
+    - `$(Type.class).single()` / `$(Type.class).all()` — consulta el árbol de UI actual por tipo de componente. Úsalo
+      para `Notification`, `Dialog` y lo que no sea accesible directamente desde la vista.
+    - `fireShortcut(Key.ENTER)` / `fireShortcut(Key.KEY_S, KeyModifier.CONTROL)` — simula atajos de teclado.
+- **Acceso a campos de componentes:** coloca los tests en el **mismo paquete** que la vista y accede a campos
+  *package-private* directamente (`view.lastNameField`, `view.resultsGrid`). Es el patrón browserless idiomático —
+  los campos no son un "backdoor" de test, son la estructura de la vista. **No añadas getters públicos solo para tests.**
+- En formularios propios (p. ej. `OwnerForm`, `PetForm`), los campos package-private del formulario forman parte de
+  su contrato — `test(view.ownerForm.firstName).setValue(...)` está bien.
+- Para aserciones de navegación, comprueba `UI.getCurrent().getInternals().getActiveViewLocation().getPath()` en lugar
+  de asertar sobre estado de dominio sacado de la vista.
+- Para aserciones de renderizado (nombre del dueño mostrado, mascota listada, etc.), localiza el `Paragraph`/`H3`/etc.
+  real vía `$(Paragraph.class)` y aserta sobre `.getText()` para ejercitar el camino de renderizado de punta a punta.
+- **Base de datos en tests:** usa **Quarkus Dev Services** — Postgres arranca automáticamente en `%dev` y `%test` con
+  Docker corriendo (`quarkus.datasource.devservices.image-name=postgres:17-alpine` en `application.properties`). No hace
+  falta un bean Spring `TestcontainersConfiguration`.
+- **Jackson:** Vaadin 25.1 requiere Jackson **3.1+**. Si una dependencia de test trae 3.0.x, fija `tools.jackson.core`
+  `jackson-core` / `jackson-databind` en `3.1.2` en `dependencyManagement` (ver `pom.xml`).
+- **Escenarios de seguridad:** con Quarkus Security en el classpath, usa `@TestSecurity` en métodos browserless (ver
+  docs de Vaadin Quarkus browserless).
 
-## AIUP skills (optional)
+## Skills AIUP (opcionales)
 
-The [AI Unified Process](https://unifiedprocess.ai/) defines optional Cursor/Claude **skills** (separate packages, not
-shipped inside this repo). If you have them installed in your editor, prefer them over ad-hoc prompts:
+El [AI Unified Process](https://unifiedprocess.ai/) define **skills** opcionales para Cursor/Claude (paquetes
+separados, no incluidos en este repo). Si los tienes instalados en el editor, úsalos en lugar de prompts ad hoc:
 
-| Skill | Use when |
+| Skill | Usar cuando |
 | --- | --- |
-| `aiup-core:entity-model` | Create or update `docs/entity_model.md` |
-| `aiup-core:use-case-spec` | Write or refine `docs/use_cases/UC-*.md` |
-| `aiup-core:use-case-diagram` | Update `docs/use_cases.puml` |
-| `aiup-core:requirements` | Broader requirements work in `docs/` |
-| `aiup-vaadin-jooq:flyway-migration` | Generate `src/main/resources/db/migration/V*.sql` from the entity model |
-| `aiup-vaadin-jooq:implement` | Implement a UC end-to-end (Vaadin view + jOOQ); adapt for **Quarkus** + `QuarkusBrowserlessTest` |
-| `aiup-vaadin-jooq:playwright-test` | Full browser E2E tests (optional; UC view tests stay browserless per *Testing conventions*) |
+| `aiup-core:entity-model` | Crear o actualizar `docs/entity_model.md` |
+| `aiup-core:use-case-spec` | Escribir o refinar `docs/use_cases/UC-*.md` |
+| `aiup-core:use-case-diagram` | Actualizar `docs/use_cases.puml` |
+| `aiup-core:requirements` | Trabajo más amplio de requisitos en `docs/` |
+| `aiup-vaadin-jooq:flyway-migration` | Generar `src/main/resources/db/migration/V*.sql` desde el modelo de entidades |
+| `aiup-vaadin-jooq:implement` | Implementar un UC de punta a punta (vista Vaadin + jOOQ); adaptar a **Quarkus** + `QuarkusBrowserlessTest` |
+| `aiup-vaadin-jooq:playwright-test` | Tests E2E en navegador (opcional; los tests de vista UC siguen siendo browserless según *Convenciones de testing*) |
 
-**If those skills are not installed**, follow the same workflow manually: read the UC spec → implement under
-`pe.joedayz.petclinic.<feature>.ui` / `.domain` → add a `QuarkusBrowserlessTest` in the view's package → `./mvnw test`.
-The `karibu-test` / UI Unit Testing skill names are obsolete; do not use them.
+**Si esos skills no están instalados**, sigue el mismo flujo a mano: lee la spec del UC → implementa bajo
+`pe.joedayz.petclinic.<feature>.ui` / `.domain` → añade un `QuarkusBrowserlessTest` en el paquete de la vista →
+`./mvnw test`.
+Los nombres de skill `karibu-test` / UI Unit Testing están obsoletos; no los uses.

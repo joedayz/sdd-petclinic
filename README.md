@@ -1,50 +1,43 @@
 # Quarkus PetClinic
 
-A demo project accompanying a talk on **Spec-Driven Development**.
+Proyecto de demostración que acompaña una charla sobre **Desarrollo Guiado por Especificaciones** (*Spec-Driven Development*).
 
-It revisits the classic Spring PetClinic sample, but built from the ground up using specifications first — use cases, an
-entity model, and UI flows — and then letting AI assistants implement the code against those specs.
+Retoma el clásico ejemplo Spring PetClinic, pero construido desde cero usando primero las especificaciones — casos de uso, modelo de entidades y flujos de UI — y dejando que los asistentes de IA implementen el código a partir de esas especificaciones.
 
 ## AI Unified Process
 
-Spec-Driven Development (SDD) flips the usual "prompt and pray" workflow on its head. Instead of asking an AI to produce
-code from a one-line request, you invest upfront in a precise, machine-readable specification of what the system should
-do. The AI then works *against* that spec — generating code, tests, and documentation that can be verified against a
-stable source of truth.
+El Desarrollo Guiado por Especificaciones (SDD) invierte el flujo habitual de «escribir un prompt y rezar». En lugar de pedirle a una IA que produzca código a partir de una solicitud de una línea, inviertes tiempo de antemano en una especificación precisa y legible por máquina de lo que el sistema debe hacer. La IA trabaja entonces *contra* esa especificación — generando código, pruebas y documentación que pueden verificarse contra una fuente de verdad estable.
 
-The [**AI Unified Process (AIUP)**](https://unifiedprocess.ai/) is a lightweight adaptation of the Unified Process for
-AI-assisted development. It keeps the artifacts that matter — use cases, domain models, architectural decisions — and
-drops the ceremony that doesn't. The result is a workflow where humans stay in charge of *intent* and AI handles the
-mechanical translation to code.
+El [**AI Unified Process (AIUP)**](https://unifiedprocess.ai/) es una adaptación ligera del Proceso Unificado para el desarrollo asistido por IA. Conserva los artefactos que importan — casos de uso, modelos de dominio, decisiones arquitectónicas — y elimina la ceremonia que no aporta. El resultado es un flujo de trabajo en el que las personas mantienen el control de la *intención* y la IA se encarga de la traducción mecánica al código.
 
-This repository is the running example used in the talk.
+Este repositorio es el ejemplo en ejecución utilizado en la charla.
 
 ## Stack
 
 - **Java 25**
 - **Quarkus 3.32**
 - **Vaadin 25** — UI
-- **jOOQ** — type-safe SQL
-- **Flyway** — database migrations
-- **PostgreSQL** (Dev Services in dev/test; Testcontainers for jOOQ codegen)
+- **jOOQ** — SQL con tipos seguros
+- **Flyway** — migraciones de base de datos
+- **PostgreSQL** (Dev Services en dev/test; Testcontainers para la generación de código jOOQ)
 
-## Specs
+## Especificaciones
 
-The specifications that drive the implementation live in [`docs/`](docs/):
+Las especificaciones que guían la implementación están en [`docs/`](docs/):
 
-- [`docs/entity_model.md`](docs/entity_model.md) — the domain model
-- [`docs/use_cases.puml`](docs/use_cases.puml) — PlantUML use case diagram
-- [`docs/use_cases/`](docs/use_cases) — individual use case specifications
+- [`docs/entity_model.md`](docs/entity_model.md) — el modelo de dominio
+- [`docs/use_cases.puml`](docs/use_cases.puml) — diagrama de casos de uso en PlantUML
+- [`docs/use_cases/`](docs/use_cases) — especificaciones individuales de casos de uso
 
-## Running locally
+## Ejecución local
 
 ```bash
 ./mvnw quarkus:dev
 ```
 
-Quarkus Dev Services starts a PostgreSQL container automatically in dev mode (Docker required).
+Quarkus Dev Services inicia automáticamente un contenedor PostgreSQL en modo desarrollo (requiere Docker).
 
-For production, configure the datasource explicitly:
+Para producción, configura el datasource de forma explícita:
 
 ```properties
 quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/petclinic
@@ -52,23 +45,23 @@ quarkus.datasource.username=petclinic
 quarkus.datasource.password=petclinic
 ```
 
-Tests use Quarkus Dev Services and need Docker running:
+Las pruebas usan Quarkus Dev Services y requieren Docker en ejecución:
 
 ```bash
 ./mvnw test
 ```
 
-Production build:
+Compilación para producción:
 
 ```bash
 ./mvnw package
 java -jar target/quarkus-app/quarkus-run.jar
 ```
 
-## Structure
+## Estructura
 
 ```
-docs/        — specifications (the source of truth)
-src/main/   — implementation derived from the specs
-src/test/   — tests verifying the implementation against the specs
+docs/        — especificaciones (la fuente de verdad)
+src/main/   — implementación derivada de las especificaciones
+src/test/   — pruebas que verifican la implementación contra las especificaciones
 ```

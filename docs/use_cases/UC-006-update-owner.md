@@ -1,58 +1,58 @@
-# Use Case: Update Owner
+# Caso de uso: Actualizar dueño
 
-## Overview
+## Resumen
 
-**Use Case ID:** UC-006   
-**Use Case Name:** Update Owner   
-**Primary Actor:** Clinic User   
-**Goal:** Modify an existing owner's contact information.   
-**Status:** Approved
+**ID del caso de uso:** UC-006   
+**Nombre del caso de uso:** Actualizar dueño   
+**Actor principal:** Usuario de la clínica   
+**Objetivo:** Modificar los datos de contacto de un dueño existente.   
+**Estado:** Aprobado
 
-## Preconditions
+## Precondiciones
 
-- The PetClinic application is running.
-- The owner to be updated exists.
-- The Clinic User has navigated to the Owner Details view for that owner (UC-005).
+- La aplicación PetClinic está en ejecución.
+- El dueño a actualizar existe.
+- El usuario de la clínica ha navegado a la vista Detalle del dueño de ese dueño (UC-005).
 
-## Main Success Scenario
+## Escenario principal de éxito
 
-1. Clinic User clicks "Edit Owner" on the Owner Details view.
-2. System loads the existing owner and displays the owner edit form, pre-filled with the current first name, last name, address, city, and telephone.
-3. Clinic User amends one or more fields and submits the form.
-4. System validates that all required fields are present and that telephone matches the 10-digit pattern.
-5. System persists the updated owner to the database.
-6. System returns to the Owner Details view and displays the notification "Owner Values Updated".
+1. El usuario de la clínica hace clic en «Editar dueño» en la vista Detalle del dueño.
+2. El sistema carga el dueño existente y muestra el formulario de edición, rellenado con el nombre, apellido, dirección, ciudad y teléfono actuales.
+3. El usuario de la clínica modifica uno o más campos y envía el formulario.
+4. El sistema valida que todos los campos obligatorios estén presentes y que el teléfono cumpla el patrón de 10 dígitos.
+5. El sistema persiste el dueño actualizado en la base de datos.
+6. El sistema vuelve a la vista Detalle del dueño y muestra la notificación «Datos del dueño actualizados».
 
-## Alternative Flows
+## Flujos alternativos
 
-### A1: Validation Errors
+### A1: Errores de validación
 
-**Trigger:** One or more fields fail validation in step 4.
-**Flow:**
+**Disparador:** Uno o más campos fallan la validación en el paso 4.
+**Flujo:**
 
-1. System re-renders the owner edit form with field error messages.
-2. System displays the notification "There was an error in updating the owner."
-3. Clinic User corrects the input.
-4. Use case continues at step 3.
+1. El sistema vuelve a renderizar el formulario de edición con mensajes de error por campo.
+2. El sistema muestra la notificación «Hubo un error al actualizar el dueño.»
+3. El usuario de la clínica corrige la entrada.
+4. El caso de uso continúa en el paso 3.
 
-## Postconditions
+## Postcondiciones
 
-### Success Postconditions
+### Postcondiciones de éxito
 
-- The owner record reflects the submitted values.
-- The user sees the updated Owner Details view.
+- El registro del dueño refleja los valores enviados.
+- El usuario ve la vista Detalle del dueño actualizada.
 
-### Failure Postconditions
+### Postcondiciones de fallo
 
-- The owner record is unchanged.
-- The edit form is redisplayed with validation feedback.
+- El registro del dueño no cambia.
+- El formulario de edición se vuelve a mostrar con retroalimentación de validación.
 
-## Business Rules
+## Reglas de negocio
 
-### BR-001: Mandatory Fields
+### BR-001: Campos obligatorios
 
-First name, last name, address, city, and telephone remain required on update.
+Nombre, apellido, dirección, ciudad y teléfono siguen siendo obligatorios en la actualización.
 
-### BR-002: Telephone Format
+### BR-002: Formato del teléfono
 
-Telephone must be exactly 10 digits (regex `\d{10}`).
+El teléfono debe tener exactamente 10 dígitos (regex `\d{10}`).

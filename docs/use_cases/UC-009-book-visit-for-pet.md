@@ -1,77 +1,77 @@
-# Use Case: Book Visit for Pet
+# Caso de uso: Reservar consulta para mascota
 
-## Overview
+## Resumen
 
-**Use Case ID:** UC-009   
-**Use Case Name:** Book Visit for Pet   
-**Primary Actor:** Clinic User   
-**Goal:** Record a veterinary visit for an existing pet, documenting the date and the reason for the appointment.   
-**Status:** Approved
+**ID del caso de uso:** UC-009   
+**Nombre del caso de uso:** Reservar consulta para mascota   
+**Actor principal:** Usuario de la clínica   
+**Objetivo:** Registrar una consulta veterinaria para una mascota existente, documentando la fecha y el motivo de la cita.   
+**Estado:** Aprobado
 
-## Preconditions
+## Precondiciones
 
-- The PetClinic application is running.
-- The owner exists.
-- The pet exists and belongs to the specified owner.
+- La aplicación PetClinic está en ejecución.
+- El dueño existe.
+- La mascota existe y pertenece al dueño indicado.
 
-## Main Success Scenario
+## Escenario principal de éxito
 
-1. Clinic User clicks "Add Visit" next to the pet on the Owner Details view.
-2. System loads the owner and pet, then displays the visit form. The date field is pre-populated with today's date; the pet's name and previous visits are shown for context.
-3. Clinic User optionally adjusts the date, enters a description of the visit, and submits the form.
-4. System validates that the description is not blank.
-5. System adds the visit to the pet and persists the owner (cascading the visit insert via `pet_id`).
-6. System returns to the Owner Details view and displays the notification "Your visit has been booked".
+1. El usuario de la clínica hace clic en «Añadir consulta» junto a la mascota en la vista Detalle del dueño.
+2. El sistema carga el dueño y la mascota, y muestra el formulario de consulta. El campo fecha se precarga con la fecha de hoy; se muestran el nombre de la mascota y las consultas anteriores como contexto.
+3. El usuario de la clínica puede ajustar la fecha, introduce una descripción de la consulta y envía el formulario.
+4. El sistema valida que la descripción no esté en blanco.
+5. El sistema añade la consulta a la mascota y persiste el dueño (insertando la consulta en cascada mediante `pet_id`).
+6. El sistema vuelve a la vista Detalle del dueño y muestra la notificación «Su consulta ha sido reservada».
 
-## Alternative Flows
+## Flujos alternativos
 
-### A1: Missing Description
+### A1: Falta la descripción
 
-**Trigger:** The description field is blank at step 4.
-**Flow:**
+**Disparador:** El campo descripción está en blanco en el paso 4.
+**Flujo:**
 
-1. System re-renders the visit form with a validation error on `description`.
-2. Clinic User enters a description.
-3. Use case continues at step 3.
+1. El sistema vuelve a renderizar el formulario de consulta con un error de validación en `description`.
+2. El usuario de la clínica introduce una descripción.
+3. El caso de uso continúa en el paso 3.
 
-### A2: Pet Not Owned by Given Owner
+### A2: La mascota no pertenece al dueño indicado
 
-**Trigger:** In step 2, the supplied pet id does not correspond to any pet belonging to the owner.
-**Flow:**
+**Disparador:** En el paso 2, el id de mascota enviado no corresponde a ninguna mascota del dueño.
+**Flujo:**
 
-1. System cannot resolve the pet for the given owner and shows the application error view.
-2. Use case ends.
+1. El sistema no puede resolver la mascota para ese dueño y muestra la vista de error de la aplicación.
+2. Fin del caso de uso.
 
-### A3: Owner Not Found
+### A3: Dueño no encontrado
 
-**Trigger:** In step 2, no owner exists for the supplied owner id.
-**Flow:**
+**Disparador:** En el paso 2, no existe ningún dueño con el id de dueño enviado.
+**Flujo:**
 
-1. System cannot resolve the owner and shows the application error view.
-2. Use case ends.
+1. El sistema no puede resolver el dueño y muestra la vista de error de la aplicación.
+2. Fin del caso de uso.
 
-## Postconditions
+## Postcondiciones
 
-### Success Postconditions
+### Postcondiciones de éxito
 
-- A new `Visit` record exists, linked to the pet via `pet_id`.
-- The visit appears in the pet's visit history on the Owner Details view.
+- Existe un nuevo registro `Visit` vinculado a la mascota mediante `pet_id`.
+- La consulta aparece en el historial de consultas de la mascota en la vista Detalle del dueño.
 
-### Failure Postconditions
+### Postcondiciones de fallo
 
-- No visit is persisted.
-- The visit form is redisplayed with validation errors, or the application error view is shown when the owner/pet cannot be resolved.
+- No se persiste ninguna consulta.
+- El formulario de consulta se vuelve a mostrar con errores de validación, o se muestra la vista de error cuando no se puede resolver el dueño o la mascota.
 
-## Business Rules
+## Reglas de negocio
 
-### BR-001: Description Required
+### BR-001: Descripción obligatoria
 
-Every visit must have a non-blank description.
+Toda consulta debe tener una descripción no vacía.
 
-### BR-002: Default Date
+### BR-002: Fecha por defecto
 
-If the user does not change the date field, the visit is recorded with today's date.
+Si el usuario no cambia el campo fecha, la consulta se registra con la fecha de hoy.
 
-### BR-003: Owner/Pet Consistency
+### BR-003: Coherencia dueño/mascota
 
-A visit can only be booked through the owner who owns the pet; the controller rejects the request if the pet id does not belong to the owner id in the URL.
+Solo se puede reservar una consulta a través del dueño que posee la mascota; el controlador rechaza la solicitud si el id de mascota no pertenece al id de dueño de la URL.

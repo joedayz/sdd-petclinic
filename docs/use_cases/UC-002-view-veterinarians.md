@@ -1,58 +1,58 @@
-# Use Case: View Veterinarians
+# Caso de uso: Ver veterinarios
 
-## Overview
+## Resumen
 
-**Use Case ID:** UC-002   
-**Use Case Name:** View Veterinarians   
-**Primary Actor:** Visitor   
-**Goal:** Browse the list of veterinarians employed at the clinic along with their specialties.   
-**Status:** Approved
+**ID del caso de uso:** UC-002   
+**Nombre del caso de uso:** Ver veterinarios   
+**Actor principal:** Visitante   
+**Objetivo:** Consultar la lista de veterinarios de la clínica junto con sus especialidades.   
+**Estado:** Aprobado
 
-## Preconditions
+## Precondiciones
 
-- The PetClinic application is running.
-- At least one veterinarian exists in the database (otherwise the list is simply empty).
+- La aplicación PetClinic está en ejecución.
+- Existe al menos un veterinario en la base de datos (de lo contrario, la lista queda vacía).
 
-## Main Success Scenario
+## Escenario principal de éxito
 
-1. Visitor clicks the "Veterinarians" link in the navigation bar.
-2. System retrieves the first chunk of veterinarians from the repository via a lazy data provider.
-3. System renders the veterinarians grid showing, for each vet, the first name, last name, and a comma-separated list of specialties (or "none" if no specialties are held).
-4. As the Visitor scrolls toward the end of the grid, the system fetches and appends the next chunk of veterinarians until all entries have been loaded.
+1. El visitante hace clic en el enlace «Veterinarios» de la barra de navegación.
+2. El sistema recupera el primer bloque de veterinarios del repositorio mediante un proveedor de datos perezoso.
+3. El sistema renderiza la cuadrícula de veterinarios mostrando, para cada uno, nombre, apellido y una lista separada por comas de especialidades (o «ninguna» si no tiene especialidades).
+4. Cuando el visitante se desplaza hacia el final de la cuadrícula, el sistema obtiene y añade el siguiente bloque de veterinarios hasta cargar todas las entradas.
 
-## Alternative Flows
+## Flujos alternativos
 
-### A1: Request Vets as JSON/XML
+### A1: Solicitar veterinarios como JSON/XML
 
-**Trigger:** A client requests `/vets` (without `.html`) expecting a machine-readable representation.
-**Flow:**
+**Disparador:** Un cliente solicita `/vets` (sin `.html`) esperando una representación legible por máquina.
+**Flujo:**
 
-1. System loads all veterinarians from the repository.
-2. System wraps them in a `Vets` container object.
-3. System returns the collection serialized as JSON or XML (content-negotiated).
-4. Use case ends.
+1. El sistema carga todos los veterinarios del repositorio.
+2. El sistema los envuelve en un objeto contenedor `Vets`.
+3. El sistema devuelve la colección serializada como JSON o XML (negociación de contenido).
+4. Fin del caso de uso.
 
-## Postconditions
+## Postcondiciones
 
-### Success Postconditions
+### Postcondiciones de éxito
 
-- The requested page (or full list) of veterinarians is rendered or returned to the caller.
-- No data is modified.
+- La página solicitada (o la lista completa) de veterinarios se muestra o devuelve al solicitante.
+- No se modifican datos.
 
-### Failure Postconditions
+### Postcondiciones de fallo
 
-- On data-access errors, the application error view is shown and no vet list is displayed.
+- Ante errores de acceso a datos, se muestra la vista de error de la aplicación y no se muestra la lista de veterinarios.
 
-## Business Rules
+## Reglas de negocio
 
-### BR-001: Lazy Loading
+### BR-001: Carga perezosa
 
-The veterinarians grid is rendered with infinite scrolling: rows are fetched lazily from the backend as the user scrolls. There are no user-visible page controls and no fixed page size.
+La cuadrícula de veterinarios usa desplazamiento infinito: las filas se obtienen de forma perezosa del backend conforme el usuario se desplaza. No hay controles de paginación visibles ni tamaño de página fijo.
 
-### BR-002: Specialty Ordering
+### BR-002: Orden de especialidades
 
-Within each vet, specialties are listed alphabetically by name.
+Dentro de cada veterinario, las especialidades se listan en orden alfabético por nombre.
 
-### BR-003: Anonymous Access
+### BR-003: Acceso anónimo
 
-Browsing veterinarians does not require authentication.
+Consultar veterinarios no requiere autenticación.

@@ -1,85 +1,85 @@
-# Use Case: Update Pet
+# Caso de uso: Actualizar mascota
 
-## Overview
+## Resumen
 
-**Use Case ID:** UC-008   
-**Use Case Name:** Update Pet   
-**Primary Actor:** Clinic User   
-**Goal:** Modify the details of an existing pet (name, birth date, or type).   
-**Status:** Approved
+**ID del caso de uso:** UC-008   
+**Nombre del caso de uso:** Actualizar mascota   
+**Actor principal:** Usuario de la clínica   
+**Objetivo:** Modificar los datos de una mascota existente (nombre, fecha de nacimiento o tipo).   
+**Estado:** Aprobado
 
-## Preconditions
+## Precondiciones
 
-- The PetClinic application is running.
-- The owner and the pet exist.
-- The Clinic User has navigated to the Owner Details view for the pet's owner.
+- La aplicación PetClinic está en ejecución.
+- El dueño y la mascota existen.
+- El usuario de la clínica ha navegado a la vista Detalle del dueño del dueño de la mascota.
 
-## Main Success Scenario
+## Escenario principal de éxito
 
-1. Clinic User clicks "Edit Pet" next to the pet on the Owner Details view.
-2. System displays the pet edit form pre-filled with the pet's current name, birth date, and type.
-3. Clinic User amends one or more fields and submits the form.
-4. System validates that:
-    - name is not blank,
-    - birth date is provided and is not in the future,
-    - no other pet belonging to the same owner (with a different id) already has the same name.
-5. System updates the pet's properties (name, birth date, type) on the owner's in-memory pet collection and persists the owner.
-6. System returns to the Owner Details view and displays the notification "Pet details has been edited".
+1. El usuario de la clínica hace clic en «Editar mascota» junto a la mascota en la vista Detalle del dueño.
+2. El sistema muestra el formulario de edición de mascota rellenado con el nombre, la fecha de nacimiento y el tipo actuales.
+3. El usuario de la clínica modifica uno o más campos y envía el formulario.
+4. El sistema valida que:
+    - el nombre no esté en blanco,
+    - la fecha de nacimiento esté indicada y no sea futura,
+    - ninguna otra mascota del mismo dueño (con distinto id) tenga ya el mismo nombre.
+5. El sistema actualiza las propiedades de la mascota (nombre, fecha de nacimiento, tipo) en la colección en memoria del dueño y persiste el dueño.
+6. El sistema vuelve a la vista Detalle del dueño y muestra la notificación «Se han editado los datos de la mascota».
 
-## Alternative Flows
+## Flujos alternativos
 
-### A1: Duplicate Pet Name
+### A1: Nombre de mascota duplicado
 
-**Trigger:** The submitted name matches a different pet already owned by this owner (step 4).
-**Flow:**
+**Disparador:** El nombre enviado coincide con otra mascota distinta que ya pertenece a este dueño (paso 4).
+**Flujo:**
 
-1. System rejects the `name` field with the error "already exists".
-2. System re-renders the pet edit form with the error.
-3. Clinic User adjusts the name.
-4. Use case continues at step 3.
+1. El sistema rechaza el campo `name` con el error «ya existe».
+2. El sistema vuelve a renderizar el formulario de edición con el error.
+3. El usuario de la clínica ajusta el nombre.
+4. El caso de uso continúa en el paso 3.
 
-### A2: Birth Date in the Future
+### A2: Fecha de nacimiento en el futuro
 
-**Trigger:** The submitted birth date is later than today (step 4).
-**Flow:**
+**Disparador:** La fecha de nacimiento enviada es posterior a hoy (paso 4).
+**Flujo:**
 
-1. System rejects the `birthDate` field with a type-mismatch error.
-2. System re-renders the pet edit form with the error.
-3. Clinic User corrects the date.
-4. Use case continues at step 3.
+1. El sistema rechaza el campo `birthDate` con un error de tipo incompatible.
+2. El sistema vuelve a renderizar el formulario de edición con el error.
+3. El usuario de la clínica corrige la fecha.
+4. El caso de uso continúa en el paso 3.
 
-### A3: Missing Required Field
+### A3: Falta un campo obligatorio
 
-**Trigger:** Name or birth date is missing (step 4).
-**Flow:**
+**Disparador:** Falta el nombre o la fecha de nacimiento (paso 4).
+**Flujo:**
 
-1. System rejects the affected field with a "required" error.
-2. System re-renders the pet edit form with the error messages.
-3. Clinic User supplies the missing value(s).
-4. Use case continues at step 3.
+1. El sistema rechaza el campo afectado con un error «obligatorio».
+2. El sistema vuelve a renderizar el formulario de edición con los mensajes de error.
+3. El usuario de la clínica proporciona el valor o valores faltantes.
+4. El caso de uso continúa en el paso 3.
 
-## Postconditions
+## Postcondiciones
 
-### Success Postconditions
+### Postcondiciones de éxito
 
-- The pet record reflects the updated name, birth date, and type.
-- The user is viewing the Owner Details view with the updated pet.
+- El registro de la mascota refleja el nombre, la fecha de nacimiento y el tipo actualizados.
+- El usuario está viendo la vista Detalle del dueño con la mascota actualizada.
 
-### Failure Postconditions
+### Postcondiciones de fallo
 
-- The pet record is unchanged.
-- The edit form is redisplayed with validation errors.
+- El registro de la mascota no cambia.
+- El formulario de edición se vuelve a mostrar con errores de validación.
 
-## Business Rules
+## Reglas de negocio
 
-### BR-001: Unique Pet Name per Owner
+### BR-001: Nombre de mascota único por dueño
 
-Two different pets belonging to the same owner cannot share a name (case-insensitive).
+Dos mascotas distintas del mismo dueño no pueden compartir nombre (sin distinguir mayúsculas/minúsculas).
 
-### BR-002: Birth Date Not in Future
+### BR-002: Fecha de nacimiento no futura
 
-A pet's birth date must not be after today.
+La fecha de nacimiento de una mascota no puede ser posterior a hoy.
 
-### BR-003: Pet Type on Update
+### BR-003: Tipo de mascota en la actualización
 
-Type may be left unchanged on update; the pet validator only enforces a type when the pet is new.
+El tipo puede dejarse sin cambios al actualizar; el validador de mascota solo exige un tipo cuando la mascota es nueva.

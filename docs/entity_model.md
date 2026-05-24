@@ -1,89 +1,89 @@
-# Entity Model
+# Modelo de entidades
 
-## Entity Relationship Diagram
+## Diagrama entidad-relación
 
 ```mermaid
 erDiagram
-    OWNER ||--o{ PET : "owns"
-    PET_TYPE ||--o{ PET : "classifies"
-    PET ||--o{ VISIT : "receives"
-    VET ||--o{ VET_SPECIALTY : "has"
-    SPECIALTY ||--o{ VET_SPECIALTY : "assigned to"
+    OWNER ||--o{ PET : "posee"
+    PET_TYPE ||--o{ PET : "clasifica"
+    PET ||--o{ VISIT : "recibe"
+    VET ||--o{ VET_SPECIALTY : "tiene"
+    SPECIALTY ||--o{ VET_SPECIALTY : "asignada a"
 ```
 
 ### OWNER
 
-Represents a pet owner who is registered with the clinic and can bring pets in for visits.
+Representa a un dueño de mascotas registrado en la clínica que puede traer mascotas a consultas.
 
-| Attribute  | Description                        | Data Type | Length/Precision | Validation Rules              |
-|------------|------------------------------------|-----------|------------------|-------------------------------|
-| id         | Unique identifier                  | Integer   | 10               | Primary Key, Sequence         |
-| first_name | Owner's first name                 | String    | 30               | Not Null                      |
-| last_name  | Owner's last name                  | String    | 30               | Not Null                      |
-| address    | Street address of the owner        | String    | 255              | Not Null                      |
-| city       | City of residence                  | String    | 80               | Not Null                      |
-| telephone  | Contact phone number (10 digits)   | String    | 20               | Not Null, Format: \d{10}      |
+| Atributo   | Descripción                              | Tipo de dato | Longitud/Precisión | Reglas de validación          |
+|------------|------------------------------------------|--------------|--------------------|-------------------------------|
+| id         | Identificador único                      | Integer      | 10                 | Clave primaria, secuencia     |
+| first_name | Nombre del dueño                         | String       | 30                 | No nulo                       |
+| last_name  | Apellido del dueño                       | String       | 30                 | No nulo                       |
+| address    | Dirección postal del dueño               | String       | 255                | No nulo                       |
+| city       | Ciudad de residencia                     | String       | 80                 | No nulo                       |
+| telephone  | Teléfono de contacto (10 dígitos)        | String       | 20                 | No nulo, formato: \d{10}      |
 
 ### PET
 
-Represents an animal belonging to an owner that can be the subject of veterinary visits.
+Representa un animal perteneciente a un dueño que puede ser objeto de consultas veterinarias.
 
-| Attribute  | Description                         | Data Type | Length/Precision | Validation Rules                |
-|------------|-------------------------------------|-----------|------------------|---------------------------------|
-| id         | Unique identifier                   | Integer   | 10               | Primary Key, Sequence           |
-| name       | Name of the pet                     | String    | 30               | Not Null                        |
-| birth_date | Date of birth of the pet            | Date      | -                | Optional                        |
-| type_id    | Reference to the pet type (species) | Integer   | 10               | Not Null, Foreign Key (TYPES.id)|
-| owner_id   | Reference to the owning owner       | Integer   | 10               | Not Null, Foreign Key (OWNERS.id)|
+| Atributo   | Descripción                                    | Tipo de dato | Longitud/Precisión | Reglas de validación                 |
+|------------|------------------------------------------------|--------------|--------------------|--------------------------------------|
+| id         | Identificador único                            | Integer      | 10                 | Clave primaria, secuencia            |
+| name       | Nombre de la mascota                           | String       | 30                 | No nulo                              |
+| birth_date | Fecha de nacimiento de la mascota              | Date         | -                  | Opcional                             |
+| type_id    | Referencia al tipo de mascota (especie)         | Integer      | 10                 | No nulo, clave foránea (TYPES.id)    |
+| owner_id   | Referencia al dueño propietario                | Integer      | 10                 | No nulo, clave foránea (OWNERS.id)   |
 
-**Constraints:** A pet's name must be unique within the scope of its owner. Birth date must not be in the future.
+**Restricciones:** El nombre de una mascota debe ser único dentro del ámbito de su dueño. La fecha de nacimiento no puede ser futura.
 
 ### PET_TYPE
 
-Defines the species or category of a pet (e.g., Cat, Dog, Hamster, Lizard, Snake, Bird).
+Define la especie o categoría de una mascota (p. ej., gato, perro, hámster, lagarto, serpiente, ave).
 
-| Attribute | Description                  | Data Type | Length/Precision | Validation Rules       |
-|-----------|------------------------------|-----------|------------------|------------------------|
-| id        | Unique identifier            | Integer   | 10               | Primary Key, Sequence  |
-| name      | Display name of the pet type | String    | 80               | Not Null, Unique       |
+| Atributo | Descripción                        | Tipo de dato | Longitud/Precisión | Reglas de validación       |
+|----------|------------------------------------|--------------|--------------------|----------------------------|
+| id       | Identificador único                | Integer      | 10                 | Clave primaria, secuencia  |
+| name     | Nombre visible del tipo de mascota | String       | 80                 | No nulo, único             |
 
 ### VISIT
 
-Represents a veterinary visit booked for a specific pet, documenting the reason for the appointment.
+Representa una consulta veterinaria reservada para una mascota concreta, documentando el motivo de la cita.
 
-| Attribute   | Description                          | Data Type | Length/Precision | Validation Rules                |
-|-------------|--------------------------------------|-----------|------------------|---------------------------------|
-| id          | Unique identifier                    | Integer   | 10               | Primary Key, Sequence           |
-| visit_date  | Date of the visit (defaults to today)| Date      | -                | Not Null                        |
-| description | Description of the visit purpose     | String    | 255              | Not Null                        |
-| pet_id      | Reference to the pet being visited   | Integer   | 10               | Not Null, Foreign Key (PETS.id) |
+| Atributo    | Descripción                              | Tipo de dato | Longitud/Precisión | Reglas de validación                |
+|-------------|------------------------------------------|--------------|--------------------|-------------------------------------|
+| id          | Identificador único                      | Integer      | 10                 | Clave primaria, secuencia           |
+| visit_date  | Fecha de la consulta (por defecto, hoy)  | Date         | -                  | No nulo                             |
+| description | Descripción del motivo de la consulta    | String       | 255                | No nulo                             |
+| pet_id      | Referencia a la mascota consultada       | Integer      | 10                 | No nulo, clave foránea (PETS.id)    |
 
 ### VET
 
-Represents a veterinarian employed by the clinic who may hold one or more specialties.
+Representa a un veterinario empleado por la clínica que puede tener una o más especialidades.
 
-| Attribute  | Description         | Data Type | Length/Precision | Validation Rules      |
-|------------|---------------------|-----------|------------------|-----------------------|
-| id         | Unique identifier   | Integer   | 10               | Primary Key, Sequence |
-| first_name | Vet's first name    | String    | 30               | Not Null              |
-| last_name  | Vet's last name     | String    | 30               | Not Null              |
+| Atributo   | Descripción           | Tipo de dato | Longitud/Precisión | Reglas de validación      |
+|------------|-----------------------|--------------|--------------------|---------------------------|
+| id         | Identificador único   | Integer      | 10                 | Clave primaria, secuencia |
+| first_name | Nombre del veterinario| String       | 30                 | No nulo                   |
+| last_name  | Apellido del veterinario | String    | 30                 | No nulo                   |
 
 ### SPECIALTY
 
-Defines a veterinary specialty (e.g., radiology, surgery, dentistry) that can be assigned to vets.
+Define una especialidad veterinaria (p. ej., radiología, cirugía, odontología) que puede asignarse a veterinarios.
 
-| Attribute | Description                | Data Type | Length/Precision | Validation Rules      |
-|-----------|----------------------------|-----------|------------------|-----------------------|
-| id        | Unique identifier          | Integer   | 10               | Primary Key, Sequence |
-| name      | Display name of specialty  | String    | 80               | Not Null, Unique      |
+| Atributo | Descripción                      | Tipo de dato | Longitud/Precisión | Reglas de validación      |
+|----------|----------------------------------|--------------|--------------------|---------------------------|
+| id       | Identificador único              | Integer      | 10                 | Clave primaria, secuencia |
+| name     | Nombre visible de la especialidad| String       | 80                 | No nulo, único            |
 
 ### VET_SPECIALTY
 
-Join entity that associates veterinarians with the specialties they hold (many-to-many).
+Entidad de unión que asocia veterinarios con las especialidades que poseen (muchos a muchos).
 
-| Attribute    | Description                     | Data Type | Length/Precision | Validation Rules                      |
-|--------------|---------------------------------|-----------|------------------|---------------------------------------|
-| vet_id       | Reference to the veterinarian   | Integer   | 10               | Not Null, Foreign Key (VETS.id)       |
-| specialty_id | Reference to the specialty held | Integer   | 10               | Not Null, Foreign Key (SPECIALTIES.id)|
+| Atributo     | Descripción                          | Tipo de dato | Longitud/Precisión | Reglas de validación                       |
+|--------------|--------------------------------------|--------------|--------------------|--------------------------------------------|
+| vet_id       | Referencia al veterinario            | Integer      | 10                 | No nulo, clave foránea (VETS.id)           |
+| specialty_id | Referencia a la especialidad asignada| Integer      | 10                 | No nulo, clave foránea (SPECIALTIES.id)     |
 
-**Constraints:** The combination of vet_id and specialty_id is unique (composite primary key).
+**Restricciones:** La combinación de vet_id y specialty_id es única (clave primaria compuesta).

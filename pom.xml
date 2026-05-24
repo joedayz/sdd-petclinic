@@ -7,7 +7,7 @@
     <artifactId>sdd-petclinic</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SDD PetClinic</name>
-    <description>Reverse-engineered Spring PetClinic to showcase Spec-driven Development</description>
+    <description>Spring PetClinic reingenierizado para demostrar el Desarrollo Guiado por Especificaciones</description>
 
     <properties>
         <maven.compiler.release>25</maven.compiler.release>
@@ -38,7 +38,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Vaadin BOM must be listed before Quarkus BOM to avoid version conflicts -->
+            <!-- El BOM de Vaadin debe ir antes que el de Quarkus para evitar conflictos de versiones -->
             <dependency>
                 <groupId>com.vaadin</groupId>
                 <artifactId>vaadin-bom</artifactId>

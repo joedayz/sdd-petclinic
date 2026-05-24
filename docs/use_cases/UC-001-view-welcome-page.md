@@ -1,40 +1,40 @@
-# Use Case: View Welcome Page
+# Caso de uso: Ver página de bienvenida
 
-## Overview
+## Resumen
 
-**Use Case ID:** UC-001   
-**Use Case Name:** View Welcome Page   
-**Primary Actor:** Visitor   
-**Goal:** Display the application's home page so the user can orient themselves and navigate to the main functional areas.   
-**Status:** Approved
+**ID del caso de uso:** UC-001   
+**Nombre del caso de uso:** Ver página de bienvenida   
+**Actor principal:** Visitante   
+**Objetivo:** Mostrar la página de inicio de la aplicación para que el usuario se oriente y navegue a las áreas funcionales principales.   
+**Estado:** Aprobado
 
-## Preconditions
+## Precondiciones
 
-- The PetClinic web application is running and reachable over HTTP.
+- La aplicación web PetClinic está en ejecución y accesible por HTTP.
 
-## Main Success Scenario
+## Escenario principal de éxito
 
-1. Visitor navigates to the root URL (`/`) of the PetClinic application.
-2. System renders the welcome page with the clinic logo, a decorative image, and the main navigation bar.
-3. Visitor sees navigation links for Home, Find Owners, Veterinarians, and Error.
+1. El visitante navega a la URL raíz (`/`) de la aplicación PetClinic.
+2. El sistema renderiza la página de bienvenida con el logo de la clínica, una imagen decorativa y la barra de navegación principal.
+3. El visitante ve enlaces de navegación para Inicio, Buscar dueños, Veterinarios y Error.
 
-## Alternative Flows
+## Flujos alternativos
 
-_None — the welcome page is static and takes no user input._
+_Ninguno — la página de bienvenida es estática y no recibe entrada del usuario._
 
-## Postconditions
+## Postcondiciones
 
-### Success Postconditions
+### Postcondiciones de éxito
 
-- Welcome page is rendered in the visitor's browser.
-- No application state is changed.
+- La página de bienvenida se muestra en el navegador del visitante.
+- No se modifica el estado de la aplicación.
 
-### Failure Postconditions
+### Postcondiciones de fallo
 
-- If the server is unavailable, the visitor's browser shows a transport error (handled outside the application).
+- Si el servidor no está disponible, el navegador del visitante muestra un error de transporte (gestionado fuera de la aplicación).
 
-## Business Rules
+## Reglas de negocio
 
-### BR-001: Anonymous Access
+### BR-001: Acceso anónimo
 
-The welcome page is accessible without authentication.
+La página de bienvenida es accesible sin autenticación.

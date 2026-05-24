@@ -1,84 +1,84 @@
-# Use Case: Find Owners by Last Name
+# Caso de uso: Buscar dueños por apellido
 
-## Overview
+## Resumen
 
-**Use Case ID:** UC-004   
-**Use Case Name:** Find Owners by Last Name   
-**Primary Actor:** Clinic User   
-**Goal:** Locate one or more owners by their last name so their details can be reviewed or edited.   
-**Status:** Approved
+**ID del caso de uso:** UC-004   
+**Nombre del caso de uso:** Buscar dueños por apellido   
+**Actor principal:** Usuario de la clínica   
+**Objetivo:** Localizar uno o más dueños por su apellido para revisar o editar sus datos.   
+**Estado:** Aprobado
 
-## Preconditions
+## Precondiciones
 
-- The PetClinic application is running.
+- La aplicación PetClinic está en ejecución.
 
-## Main Success Scenario
+## Escenario principal de éxito
 
-1. Clinic User clicks "Find Owners" in the navigation bar.
-2. System displays the Find Owners form with a single "Last name" input field.
-3. Clinic User enters all or the beginning of an owner's last name and submits the form.
-4. System queries the owner repository using a "starts with" match on last name.
-5. System finds more than one matching owner and renders the Owners List with infinite scrolling, showing, for each owner, their name, address, city, telephone, and pets.
-6. Clinic User selects an owner from the list to navigate to the Owner Details view (UC-005).
+1. El usuario de la clínica hace clic en «Buscar dueños» en la barra de navegación.
+2. El sistema muestra el formulario Buscar dueños con un único campo de entrada «Apellido».
+3. El usuario de la clínica introduce todo o el inicio del apellido de un dueño y envía el formulario.
+4. El sistema consulta el repositorio de dueños usando coincidencia «empieza por» sobre el apellido.
+5. El sistema encuentra más de un dueño coincidente y renderiza la Lista de dueños con desplazamiento infinito, mostrando para cada uno nombre, dirección, ciudad, teléfono y mascotas.
+6. El usuario de la clínica selecciona un dueño de la lista para navegar a la vista Detalle del dueño (UC-005).
 
-## Alternative Flows
+## Flujos alternativos
 
-### A1: Empty Last-Name Search
+### A1: Búsqueda con apellido vacío
 
-**Trigger:** Clinic User submits the form with an empty last-name field in step 3.
-**Flow:**
+**Disparador:** El usuario de la clínica envía el formulario con el campo apellido vacío en el paso 3.
+**Flujo:**
 
-1. System treats the empty string as a broadest-possible search and returns all owners, lazily loaded as the user scrolls.
-2. Use case continues at step 5.
+1. El sistema trata la cadena vacía como la búsqueda más amplia posible y devuelve todos los dueños, cargados de forma perezosa conforme el usuario se desplaza.
+2. El caso de uso continúa en el paso 5.
 
-### A2: Exactly One Match
+### A2: Exactamente una coincidencia
 
-**Trigger:** The "starts with" query returns exactly one owner in step 4.
-**Flow:**
+**Disparador:** La consulta «empieza por» devuelve exactamente un dueño en el paso 4.
+**Flujo:**
 
-1. System navigates directly to the Owner Details view for that owner (UC-005).
-2. Use case ends.
+1. El sistema navega directamente a la vista Detalle del dueño de ese dueño (UC-005).
+2. Fin del caso de uso.
 
-### A3: No Match
+### A3: Sin coincidencias
 
-**Trigger:** The query returns no owners in step 4.
-**Flow:**
+**Disparador:** La consulta no devuelve dueños en el paso 4.
+**Flujo:**
 
-1. System re-renders the Find Owners form.
-2. System attaches the error "not found" to the last-name field.
-3. Clinic User adjusts the search term.
-4. Use case continues at step 3.
+1. El sistema vuelve a renderizar el formulario Buscar dueños.
+2. El sistema adjunta el error «no encontrado» al campo apellido.
+3. El usuario de la clínica ajusta el término de búsqueda.
+4. El caso de uso continúa en el paso 3.
 
-### A4: Scroll Through Results
+### A4: Desplazarse por los resultados
 
-**Trigger:** The result set is larger than what fits on screen (step 5).
-**Flow:**
+**Disparador:** El conjunto de resultados es mayor de lo que cabe en pantalla (paso 5).
+**Flujo:**
 
-1. Clinic User scrolls toward the bottom of the Owners List.
-2. System fetches the next chunk of owners from the repository and appends them to the list.
-3. Use case continues at step 5 or 6.
+1. El usuario de la clínica se desplaza hacia el final de la Lista de dueños.
+2. El sistema obtiene el siguiente bloque de dueños del repositorio y lo añade a la lista.
+3. El caso de uso continúa en el paso 5 o 6.
 
-## Postconditions
+## Postcondiciones
 
-### Success Postconditions
+### Postcondiciones de éxito
 
-- The matching owners are displayed, or the user is redirected to a single owner's details page.
-- No data is modified.
+- Se muestran los dueños coincidentes, o el usuario es redirigido a la página de detalle de un único dueño.
+- No se modifican datos.
 
-### Failure Postconditions
+### Postcondiciones de fallo
 
-- The Find Owners form is redisplayed with a "not found" message.
+- El formulario Buscar dueños se vuelve a mostrar con el mensaje «no encontrado».
 
-## Business Rules
+## Reglas de negocio
 
-### BR-001: Prefix Match
+### BR-001: Coincidencia por prefijo
 
-Searches use a case-sensitive "starts with" match on last name; full-string matches are not required.
+Las búsquedas usan coincidencia sensible a mayúsculas «empieza por» sobre el apellido; no se exige coincidencia de cadena completa.
 
-### BR-002: Lazy Loading
+### BR-002: Carga perezosa
 
-The Owners List is rendered with infinite scrolling: rows are fetched lazily from the backend as the user scrolls. There are no user-visible page controls and no fixed page size.
+La Lista de dueños usa desplazamiento infinito: las filas se obtienen de forma perezosa del backend conforme el usuario se desplaza. No hay controles de paginación visibles ni tamaño de página fijo.
 
-### BR-003: Empty Search Returns All
+### BR-003: Búsqueda vacía devuelve todos
 
-An empty last-name field returns every owner rather than raising a validation error.
+Un campo apellido vacío devuelve todos los dueños en lugar de generar un error de validación.

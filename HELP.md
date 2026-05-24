@@ -1,29 +1,29 @@
-# Getting Started
+# Primeros pasos
 
-### Reference Documentation
+### Documentación de referencia
 
-For further reference, please consider the following sections:
+Para más información, consulta las siguientes secciones:
 
-* [Quarkus guides](https://quarkus.io/guides/)
-* [Using Quarkus with Vaadin](https://vaadin.com/docs/latest/flow/integrations/quarkus)
+* [Guías de Quarkus](https://quarkus.io/guides/)
+* [Usar Quarkus con Vaadin](https://vaadin.com/docs/latest/flow/integrations/quarkus)
 * [Quarkus Dev Services](https://quarkus.io/guides/dev-services)
-* [Quarkus Flyway extension](https://quarkus.io/guides/flyway)
-* [Quarkus jOOQ extension](https://quarkiverse.github.io/quarkiverse-docs/quarkus-jooq/dev/index.html)
-* [Testcontainers jOOQ codegen Maven plugin](https://github.com/testcontainers/testcontainers-jooq-codegen-maven-plugin)
+* [Extensión Flyway para Quarkus](https://quarkus.io/guides/flyway)
+* [Extensión jOOQ para Quarkus](https://quarkiverse.github.io/quarkiverse-docs/quarkus-jooq/dev/index.html)
+* [Plugin Maven testcontainers-jooq-codegen](https://github.com/testcontainers/testcontainers-jooq-codegen-maven-plugin)
 
-### Guides
+### Guías
 
-The following guides illustrate how to use some features concretely:
+Las siguientes guías muestran cómo usar algunas funcionalidades de forma concreta:
 
-* [Creating CRUD UI with Vaadin](https://spring.io/guides/gs/crud-with-vaadin/)
-* [Building a RESTful Web Service](https://quarkus.io/guides/getting-started-reactive)
+* [Crear una UI CRUD con Vaadin](https://spring.io/guides/gs/crud-with-vaadin/)
+* [Construir un servicio web RESTful](https://quarkus.io/guides/getting-started-reactive)
 
 ### Dev Services
 
-This project uses [Quarkus Dev Services](https://quarkus.io/guides/dev-services) to start a PostgreSQL container automatically in dev and test mode.
+Este proyecto usa [Quarkus Dev Services](https://quarkus.io/guides/dev-services) para iniciar automáticamente un contenedor PostgreSQL en modo desarrollo y pruebas.
 
-The configured image is `postgres:17-alpine`. Please review the tag and set it to match what you run in production.
+La imagen configurada es `postgres:17-alpine`. Revisa la etiqueta y ajústala para que coincida con la que uses en producción.
 
-### jOOQ code generation
+### Generación de código jOOQ
 
-jOOQ sources are generated at build time by the `testcontainers-jooq-codegen-maven-plugin`, which spins up a temporary PostgreSQL container, applies Flyway migrations from `src/main/resources/db/migration`, and generates type-safe SQL classes into `target/generated-sources/jooq`.
+Las fuentes jOOQ se generan en tiempo de compilación mediante el plugin `testcontainers-jooq-codegen-maven-plugin`, que levanta un contenedor PostgreSQL temporal, aplica las migraciones Flyway de `src/main/resources/db/migration` y genera clases SQL con tipos seguros en `target/generated-sources/jooq`.

@@ -121,6 +121,12 @@
             <artifactId>browserless-test-quarkus</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Required by browserless-test-quarkus to resolve CurrentIdentityAssociation -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-security</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

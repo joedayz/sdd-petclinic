@@ -41,6 +41,7 @@ Si un caso de uso y el código no coinciden, gana el caso de uso salvo que el us
 
 # Ejecutar una clase o método de test concreto
 ./mvnw test -Dtest=PetclinicApplicationTest
+./mvnw test -Dtest=UC001VerPaginaBienvenidaTest
 ./mvnw test -Dtest=OwnerViewTest#findsOwnersByLastName
 
 # Regenerar fuentes jOOQ tras cambiar una migración Flyway
@@ -73,6 +74,16 @@ justifique extraerla.
 
 ## Convenciones de testing
 
+Los tests de vista son **tests de caso de uso**. Sigue el skill `aiup-vaadin-jooq:browserless-test` (adaptado a Quarkus
+abajo) en lugar de inventar otra estructura.
+
+- **Nombre de clase:** `UC<id><NombrePascalDelCasoDeUso>Test` — p. ej. `UC001VerPaginaBienvenidaTest` para UC-001
+  *Ver página de bienvenida*.
+- **`@UseCase` en cada método de test** — enlaza spec ↔ test para el plugin AIUP IntelliJ Navigator. Si no existe
+  `@interface UseCase` en el proyecto, créala en `pe.joedayz.petclinic` con la forma canónica del skill
+  (`id`, `scenario` por defecto `"Main Success Scenario"`, `businessRules`).
+- **Un método `@Test` por escenario** del UC (escenario principal, cada flujo alternativo `A1`, `A2`, …) y por regla de
+  negocio relevante (`BR-XXX` en `businessRules` cuando aplique).
 - **Vaadin Browserless Testing** para Quarkus: añade `browserless-test-quarkus` y `quarkus-junit` (scope test). Ver
   https://vaadin.com/docs/latest/flow/testing/browserless/quarkus.
 - Los tests de vista extienden `QuarkusBrowserlessTest` y llevan `@QuarkusTest`. Quarkus arranca la aplicación en la
@@ -102,10 +113,10 @@ justifique extraerla.
 - **Escenarios de seguridad:** con Quarkus Security en el classpath, usa `@TestSecurity` en métodos browserless (ver
   docs de Vaadin Quarkus browserless).
 
-## Skills AIUP (opcionales)
+## Skills AIUP
 
-El [AI Unified Process](https://unifiedprocess.ai/) define **skills** opcionales para Cursor/Claude (paquetes
-separados, no incluidos en este repo). Si los tienes instalados en el editor, úsalos en lugar de prompts ad hoc:
+Este repo está pensado para usarse con los skills del [AI Unified Process](https://unifiedprocess.ai/) instalados en
+Cursor/Claude. **Prefiérelos siempre** a generación ad hoc; adapta solo lo que el skill asuma de Spring Boot (ver abajo).
 
 | Skill | Usar cuando |
 | --- | --- |
@@ -114,10 +125,23 @@ separados, no incluidos en este repo). Si los tienes instalados en el editor, ú
 | `aiup-core:use-case-diagram` | Actualizar `docs/use_cases.puml` |
 | `aiup-core:requirements` | Trabajo más amplio de requisitos en `docs/` |
 | `aiup-vaadin-jooq:flyway-migration` | Generar `src/main/resources/db/migration/V*.sql` desde el modelo de entidades |
-| `aiup-vaadin-jooq:implement` | Implementar un UC de punta a punta (vista Vaadin + jOOQ); adaptar a **Quarkus** + `QuarkusBrowserlessTest` |
-| `aiup-vaadin-jooq:playwright-test` | Tests E2E en navegador (opcional; los tests de vista UC siguen siendo browserless según *Convenciones de testing*) |
+| `aiup-vaadin-jooq:implement` | **Solo** vista Vaadin + jOOQ del UC (el skill **no** crea tests) |
+| `aiup-vaadin-jooq:browserless-test` | Tests browserless del UC: `UC00N…Test`, `@UseCase`, un test por escenario/BR |
+| `aiup-vaadin-jooq:playwright-test` | Tests E2E en navegador (opcional; los UC de vista siguen con browserless) |
 
-**Si esos skills no están instalados**, sigue el mismo flujo a mano: lee la spec del UC → implementa bajo
-`pe.joedayz.petclinic.<feature>.ui` / `.domain` → añade un `QuarkusBrowserlessTest` en el paquete de la vista →
-`./mvnw test`.
-Los nombres de skill `karibu-test` / UI Unit Testing están obsoletos; no los uses.
+### Flujo por caso de uso
+
+1. Leer `docs/use_cases/UC-NNN-*.md` (y `entity_model.md` si hay persistencia).
+2. Skill **`implement`** → código en `pe.joedayz.petclinic.<feature>.ui` / `.domain`.
+3. Skill **`browserless-test`** → clase `UC00N…Test` en el **mismo paquete** que la vista, con `@UseCase` en cada
+   método; base class **`QuarkusBrowserlessTest`** + **`@QuarkusTest`** (no `SpringBrowserlessTest` ni
+   `@SpringBootTest`).
+4. `./mvnw test`.
+
+**Adaptación Quarkus del skill browserless-test:** sustituir `SpringBrowserlessTest` / `@SpringBootTest` /
+`TestcontainersConfiguration` por `QuarkusBrowserlessTest` / `@QuarkusTest` / Quarkus Dev Services. Mantener acceso a
+campos package-private de la vista cuando la spec lo permita; usar `$()` para overlays no alcanzables desde la vista.
+
+**Si los skills no están instalados**, replica el mismo flujo manualmente según *Convenciones de testing*.
+
+Los nombres `karibu-test` / UI Unit Testing están obsoletos; no los uses.
